@@ -30,15 +30,11 @@ jobs:
         uses: android-actions/setup-android@v3
         with:
           cmdline-tools-version: 12266719
+          packages: >-
+            platform-tools
+            platforms;android-35
+            build-tools;35.0.0
           accept-android-sdk-licenses: true
-
-      - name: Install Android SDK packages
-        shell: bash
-        run: |
-          sdkmanager --sdk_root="${ANDROID_SDK_ROOT}" \
-            "platform-tools" \
-            "platforms;android-35" \
-            "build-tools;35.0.0"
      
       - name: Grant Gradle permission
         run: chmod +x ./gradlew
