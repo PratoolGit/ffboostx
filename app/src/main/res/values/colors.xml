@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Mirrors BoostColors.Void / Ember so the launcher icon and the launch
+         window match the Compose palette exactly. -->
+    <color name="boost_void">#FF05060A</color>
+    <color name="boost_ember">#FFFF6B2C</color>
+</resources>

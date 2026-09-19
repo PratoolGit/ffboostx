@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+        A minimal launch theme. The window background matches the app's darkest
+        surface so the cold-start frame does not flash a light panel before
+        Compose draws. Bar colours are left transparent because the activity
+        calls enableEdgeToEdge() and Compose applies the insets itself.
+    -->
+    <style name="Theme.FFBoostX" parent="android:style/Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/boost_void</item>
+        <item name="android:colorBackground">@color/boost_void</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+    </style>
+</resources>

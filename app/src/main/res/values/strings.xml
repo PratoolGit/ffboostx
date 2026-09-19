@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">FF BoostX</string>
+    <string name="accessibility_macro_description">FF BoostX macro recorder and replay controls. Records user-approved touch gestures locally and replays saved macros when requested.</string>
+</resources>
