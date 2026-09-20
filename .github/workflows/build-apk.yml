@@ -1,15 +1,13 @@
-name: Build Android APK
+name: Build FF BoostX Release APK
 
 on:
   push:
-    branches: [main, master]
-  pull_request:
     branches: [main, master]
   workflow_dispatch:
 
 jobs:
   build:
-    name: Build Release APK
+    name: Build Signed Release APK
     runs-on: ubuntu-latest
 
     steps:
@@ -24,25 +22,39 @@ jobs:
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
-        with:
-          cmdline-tools-version: 12266719
-          packages: >-
-            platform-tools
-            platforms;android-35
-            build-tools;35.0.0
-          accept-android-sdk-licenses: true
 
       - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v6
+        uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: '9.7.1'
+          gradle-version: '8.9'
 
-      - name: Build Release APK
-        run: gradle assembleRelease
+      - name: Install Android SDK components
+        run: |
+          yes | sdkmanager --licenses > /dev/null || true
+          sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
 
-      - name: Upload Release APK
+      - name: Restore signing keystore
+        env:
+          FF_KEYSTORE_BASE64: ${{ secrets.FF_KEYSTORE }}
+        run: |
+          echo "$FF_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/ffboostx-release.jks"
+
+      - name: Build signed release APK
+        run: |
+          gradle assembleRelease \
+            -PffKeystore="$RUNNER_TEMP/ffboostx-release.jks" \
+            -PffStorePassword="${{ secrets.FF_STORE_PASSWORD }}" \
+            -PffKeyAlias="${{ secrets.FF_KEY_ALIAS }}" \
+            -PffKeyPassword="${{ secrets.FF_KEY_PASSWORD }}"
+
+      - name: Verify APK signature
+        run: |
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose \
+            app/build/outputs/apk/release/app-release.apk
+
+      - name: Upload signed APK
         uses: actions/upload-artifact@v4
         with:
-          name: Gaming-Booster-Release-APK
-          path: app/build/outputs/apk/release/*.apk
+          name: FF-BoostX-Release-APK
+          path: app/build/outputs/apk/release/app-release.apk
           if-no-files-found: error
