@@ -38,20 +38,18 @@ jobs:
         with:
           gradle-version: '8.9'
 
-      - name: Create signing keystore
+      - name: Restore permanent signing keystore
         env:
+          FF_KEYSTORE: ${{ secrets.FF_KEYSTORE }}
           FF_STORE_PASSWORD: ${{ secrets.FF_STORE_PASSWORD }}
         run: |
-          keytool -genkeypair \
-            -keystore "$RUNNER_TEMP/ffboostx-release.jks" \
-            -storetype PKCS12 \
-            -storepass "$FF_STORE_PASSWORD" \
-            -keypass "$FF_STORE_PASSWORD" \
-            -alias ffboostx \
-            -keyalg RSA \
-            -keysize 2048 \
-            -validity 10000 \
-            -dname "CN=FF BoostX, OU=Development, O=FF BoostX, L=India, ST=Jharkhand, C=IN"
+          if [ -z "$FF_KEYSTORE" ] || [ -z "$FF_STORE_PASSWORD" ]; then
+            echo "::error::FF_KEYSTORE / FF_STORE_PASSWORD secrets are missing. Run 'Create FF BoostX Release Key' once, then save its output as the FF_KEYSTORE secret."
+            exit 1
+          fi
+          printf '%s' "$FF_KEYSTORE" | base64 --decode > "$RUNNER_TEMP/ffboostx-release.jks"
+          keytool -list -keystore "$RUNNER_TEMP/ffboostx-release.jks" \
+            -storepass "$FF_STORE_PASSWORD" -alias ffboostx
 
       - name: Build signed release APK
         env:
