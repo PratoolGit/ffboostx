@@ -74,11 +74,7 @@
                     them down when the session ends." />
         </service>
 
-        <!--
-            Local VpnService that drops other apps' traffic while you play. It
-            never reads, forwards or logs a packet and contacts no server; the
-            tunnel is established and then left alone.
-        -->
+        <!-- Accessibility service used for tap/swipe macro record and replay. -->
         <service
             android:name=".overlay.MacroAccessibilityService"
             android:exported="false"
@@ -92,6 +88,11 @@
                 android:resource="@xml/macro_accessibility_service" />
         </service>
 
+        <!--
+            Local VpnService that drops other apps' traffic while you play. It
+            never reads, forwards or logs a packet and contacts no server; the
+            tunnel is established and then left alone.
+        -->
         <service
             android:name=".overlay.BackgroundNetworkBlocker"
             android:exported="false"
