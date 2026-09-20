@@ -38,38 +38,42 @@ jobs:
         with:
           gradle-version: '8.9'
 
-      - name: Restore and validate signing keystore
+      - name: Create signing keystore
         env:
-          FF_KEYSTORE_BASE64: ${{ secrets.FF_KEYSTORE }}
+          FF_STORE_PASSWORD: ${{ secrets.FF_STORE_PASSWORD }}
+          FF_KEY_PASSWORD: ${{ secrets.FF_KEY_PASSWORD }}
+        run: |
+          keytool -genkeypair \
+            -keystore "$RUNNER_TEMP/ffboostx-release.jks" \
+            -storetype PKCS12 \
+            -storepass "$FF_STORE_PASSWORD" \
+            -keypass "$FF_KEY_PASSWORD" \
+            -alias ffboostx \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -dname "CN=FF BoostX, OU=Development, O=FF BoostX, L=India, ST=Jharkhand, C=IN"
+
+      - name: Validate signing keystore
+        env:
           FF_STORE_PASSWORD: ${{ secrets.FF_STORE_PASSWORD }}
         run: |
-          set -e
-
-          printf '%s' "$FF_KEYSTORE_BASE64" \
-            | tr -d '\r\n ' \
-            | base64 --decode \
-            > "$RUNNER_TEMP/ffboostx-release.jks"
-
-          echo "Checking keystore file..."
-
-          file "$RUNNER_TEMP/ffboostx-release.jks"
-
-          echo "Checking keystore with PKCS12..."
-
           keytool -list \
             -storetype PKCS12 \
             -keystore "$RUNNER_TEMP/ffboostx-release.jks" \
             -storepass "$FF_STORE_PASSWORD"
 
-          echo "PKCS12 keystore validation succeeded."
-
       - name: Build signed release APK
+        env:
+          FF_STORE_PASSWORD: ${{ secrets.FF_STORE_PASSWORD }}
+          FF_KEY_PASSWORD: ${{ secrets.FF_KEY_PASSWORD }}
+          FF_KEY_ALIAS: ${{ secrets.FF_KEY_ALIAS }}
         run: |
           gradle assembleRelease \
             -PffKeystore="$RUNNER_TEMP/ffboostx-release.jks" \
-            -PffStorePassword="${{ secrets.FF_STORE_PASSWORD }}" \
-            -PffKeyAlias="${{ secrets.FF_KEY_ALIAS }}" \
-            -PffKeyPassword="${{ secrets.FF_KEY_PASSWORD }}"
+            -PffStorePassword="$FF_STORE_PASSWORD" \
+            -PffKeyAlias="$FF_KEY_ALIAS" \
+            -PffKeyPassword="$FF_KEY_PASSWORD"
 
       - name: Verify APK signature
         run: |
