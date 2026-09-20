@@ -27,7 +27,8 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SYSTEM_EXEMPTED" />
     <!-- Shows the ongoing notification that both services are required to post. -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-
+    <uses-permission android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE" />
+    <uses-permission android:permission="android.permission.BIND_VPN_SERVICE" />
     <!--
         Package visibility for Android 11+. Only the two games the app can launch
         are declared; QUERY_ALL_PACKAGES is deliberately not requested.
