@@ -56,13 +56,12 @@ jobs:
       - name: Build signed release APK
         env:
           FF_STORE_PASSWORD: ${{ secrets.FF_STORE_PASSWORD }}
-          FF_KEY_PASSWORD: ${{ secrets.FF_KEY_PASSWORD }}
         run: |
           gradle assembleRelease \
             -PffKeystore="$RUNNER_TEMP/ffboostx-release.jks" \
             -PffStorePassword="$FF_STORE_PASSWORD" \
             -PffKeyAlias="ffboostx" \
-            -PffKeyPassword="$FF_KEY_PASSWORD"
+            -PffKeyPassword="$FF_STORE_PASSWORD"
 
       - name: Verify APK signature
         run: |
