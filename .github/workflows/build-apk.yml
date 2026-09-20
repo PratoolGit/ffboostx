@@ -38,11 +38,30 @@ jobs:
         with:
           gradle-version: '8.9'
 
-      - name: Restore signing keystore
+      - name: Restore and validate signing keystore
         env:
           FF_KEYSTORE_BASE64: ${{ secrets.FF_KEYSTORE }}
+          FF_STORE_PASSWORD: ${{ secrets.FF_STORE_PASSWORD }}
         run: |
-          echo "$FF_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/ffboostx-release.jks"
+          set -e
+
+          printf '%s' "$FF_KEYSTORE_BASE64" \
+            | tr -d '\r\n ' \
+            | base64 --decode \
+            > "$RUNNER_TEMP/ffboostx-release.jks"
+
+          echo "Checking keystore file..."
+
+          file "$RUNNER_TEMP/ffboostx-release.jks"
+
+          echo "Checking keystore with PKCS12..."
+
+          keytool -list \
+            -storetype PKCS12 \
+            -keystore "$RUNNER_TEMP/ffboostx-release.jks" \
+            -storepass "$FF_STORE_PASSWORD"
+
+          echo "PKCS12 keystore validation succeeded."
 
       - name: Build signed release APK
         run: |
