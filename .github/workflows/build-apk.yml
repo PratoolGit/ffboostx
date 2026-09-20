@@ -41,27 +41,17 @@ jobs:
       - name: Create signing keystore
         env:
           FF_STORE_PASSWORD: ${{ secrets.FF_STORE_PASSWORD }}
-          FF_KEY_PASSWORD: ${{ secrets.FF_KEY_PASSWORD }}
         run: |
           keytool -genkeypair \
             -keystore "$RUNNER_TEMP/ffboostx-release.jks" \
             -storetype PKCS12 \
             -storepass "$FF_STORE_PASSWORD" \
-            -keypass "$FF_KEY_PASSWORD" \
+            -keypass "$FF_STORE_PASSWORD" \
             -alias ffboostx \
             -keyalg RSA \
             -keysize 2048 \
             -validity 10000 \
             -dname "CN=FF BoostX, OU=Development, O=FF BoostX, L=India, ST=Jharkhand, C=IN"
-
-      - name: Validate signing keystore
-        env:
-          FF_STORE_PASSWORD: ${{ secrets.FF_STORE_PASSWORD }}
-        run: |
-          keytool -list \
-            -storetype PKCS12 \
-            -keystore "$RUNNER_TEMP/ffboostx-release.jks" \
-            -storepass "$FF_STORE_PASSWORD"
 
       - name: Build signed release APK
         env:
